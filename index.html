@@ -30,33 +30,42 @@
 
     <script>
         function split(dices, limit, current, damages) {
-            if (damages === undefined) {
-                damages = [dices]
-            }
-            if (current === undefined) {
-                current = 1
-            }
-            dices /= 2
-            if (current >= limit || dices < 1) {
-                const origin = damages.shift()
-                const sum = damages.reduce((a, b) => a + b)
+    if (damages === undefined) {
+        damages = [dices]
+    }
+    if (current === undefined) {
+        current = 1
+    }
+    if (limit === 1) {
+        return damages
+    }
 
-                if (current >= limit) {
-                    damages.push(origin - sum)
-                    return damages
-                }
+    dices /= 2
+    if (current >= limit || dices < 1) {
+        const origin = damages.shift()
+        const sum = damages.reduce((a, b) => a + b)
 
-                if (origin > sum) {
-                    damages.push(1)
-                }
-                if (origin < sum) {
-                    damages[damages.length - 1]--
-                }
-                return damages
+        if (current >= limit) {
+            const difference = origin - sum
+            if (difference < 0) {
+                damages[damages.length - 1] += difference
+            } else if (difference > 0) {
+                damages.push(difference)
             }
-            damages.push(Math.ceil(dices))
-            return split(dices, limit, current + 1, damages)
+            return damages
         }
+
+        if (origin > sum) {
+            damages.push(1)
+        }
+        if (origin < sum) {
+            damages[damages.length - 1]--
+        }
+        return damages
+    }
+    damages.push(Math.ceil(dices))
+    return split(dices, limit, current + 1, damages)
+}
 
         function formatDice(value) {
             return value + " dice" + (value > 1 ? "s" : "")
