@@ -1,0 +1,52 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Scamage</title>
+
+    <!-- <style>
+        div {
+            color: black;
+        }
+    </style> -->
+</head>
+
+<body>
+    <h1>Alois' Damage spliter</h1>
+    <label>Number of dices
+      <input id="dices" type="number" />
+    </label>
+    <button type="button" id="test">Launch</button>
+    <div id="result"></div>
+
+    <script>
+        function split(dices, damages) {
+            if (damages === undefined) {
+                damages = [dices]
+            }
+            dices /= 2
+            if (dices < 1) {
+                const origin = damages.shift()
+                const sum = damages.reduce((a, b) => a + b);
+                if (origin > sum) {
+                    damages.push(1)
+                }
+                if (origin < sum) {
+                    damages[damages.length - 1]--
+                }
+                return damages
+            }
+            damages.push(Math.ceil(dices))
+            return split(dices, damages)
+        }
+
+        document.getElementById('test').addEventListener('click', function () {
+            const count = parseInt(document.getElementById("dices").value);
+            document.getElementById("result").textContent = JSON.stringify(split(count))
+        }, false);
+    </script>
+</body>
+
+</html>
