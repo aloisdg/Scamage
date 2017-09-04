@@ -14,6 +14,7 @@
 </head>
 
 <body>
+    <!-- https://images.duckduckgo.com/iur/?u=http://game-icons.net/icons/lorc/originals/png/000000/transparent/thunder-struck.png -->
     <h1>Scamage</h1>
     <h2>Alois' Damage scatter</h2>
     <label>Number of dice
@@ -28,14 +29,23 @@
     <div id="result"></div>
 
     <script>
-        function split(dices, damages) {
+        function split(dices, limit, current, damages) {
             if (damages === undefined) {
                 damages = [dices]
             }
+            if (current === undefined) {
+                current = 1
+            }
             dices /= 2
-            if (dices < 1) {
+            if (current >= limit || dices < 1) {
                 const origin = damages.shift()
-                const sum = damages.reduce((a, b) => a + b);
+                const sum = damages.reduce((a, b) => a + b)
+
+                if (current >= limit) {
+                    damages.push(origin - sum)
+                    return damages
+                }
+
                 if (origin > sum) {
                     damages.push(1)
                 }
@@ -45,39 +55,36 @@
                 return damages
             }
             damages.push(Math.ceil(dices))
-            return split(dices, damages)
+            return split(dices, limit, current + 1, damages)
         }
 
         function formatDice(value) {
-            return value + " dice" + (value > 1 ? "s" : "");
-        }
-
-        function fixSplit(splits, targets) {
-            var toto = splits;
-            for (var i = toto.length - 1; i >= targets; i--) {
-                toto[i - 1] += toto[i] // pop()
-            }
-            return toto.slice(0, targets);
+            return value + " dice" + (value > 1 ? "s" : "")
         }
 
         document.getElementById('test').addEventListener('click', function () {
             const dices = parseInt(document.getElementById("dices").value),
                 targets = parseInt(document.getElementById("targets").value)
 
-            // todo: fix limit
-            if (dices < 2 || targets < 2) {
+            if (dices < 2 || targets < 1) {
                 document.getElementById("result").innerHTML = 'Usage: dices > 1 && targets > 1'
                 return
             }
 
-            let splits = split(dices)
-            const output = splits > targets ? fixSplit(splits, targets) : splits
+            if (targets === 1) {
+                document.getElementById("result").innerHTML = 'target 1 : ' + formatDice(dices)
+                return
+            }
+
+            let splits = split(dices, targets)
+            // const output = splits > targets ? fixSplit(splits, targets) : splits
+            const output = splits
             const results = Array(targets).fill(0)
                 .map((x, i) => "target " + (i + 1) + ": " + (i + 1 > output.length ? "nothing" : formatDice(output[i])))
                 .join('<br/>')
 
             document.getElementById("result").innerHTML = results
-        }, false);
+        }, false)
     </script>
 </body>
 
