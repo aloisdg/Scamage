@@ -14,10 +14,16 @@
 </head>
 
 <body>
-    <h1>Alois' Damage spliter</h1>
-    <label>Number of dices
-      <input id="dices" type="number" />
+    <h1>Scamage</h1>
+    <h2>Alois' Damage scatter</h2>
+    <label>Number of dice
+        <input id="dices" type="number" />
     </label>
+    <br/>
+    <label>Number of target
+        <input id="targets" type="number" />
+    </label>
+    <br/>
     <button type="button" id="test">Launch</button>
     <div id="result"></div>
 
@@ -42,9 +48,35 @@
             return split(dices, damages)
         }
 
+        function formatDice(value) {
+            return value + " dice" + (value > 1 ? "s" : "");
+        }
+
+        function fixSplit(splits, targets) {
+            var toto = splits;
+            for (var i = toto.length - 1; i >= targets; i--) {
+                toto[i - 1] += toto[i] // pop()
+            }
+            return toto.slice(0, targets);
+        }
+
         document.getElementById('test').addEventListener('click', function () {
-            const count = parseInt(document.getElementById("dices").value);
-            document.getElementById("result").textContent = JSON.stringify(split(count))
+            const dices = parseInt(document.getElementById("dices").value),
+                targets = parseInt(document.getElementById("targets").value)
+
+            // todo: fix limit
+            if (dices < 2 || targets < 2) {
+                document.getElementById("result").innerHTML = 'Usage: dices > 1 && targets > 1'
+                return
+            }
+
+            let splits = split(dices)
+            const output = splits > targets ? fixSplit(splits, targets) : splits
+            const results = Array(targets).fill(0)
+                .map((x, i) => "target " + (i + 1) + ": " + (i + 1 > output.length ? "nothing" : formatDice(output[i])))
+                .join('<br/>')
+
+            document.getElementById("result").innerHTML = results
         }, false);
     </script>
 </body>
